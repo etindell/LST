@@ -73,6 +73,38 @@
             margin-top: 10px;
             display: none;
         }
+        /* New comment styles */
+        .comment-form {
+            margin-top: 20px;
+        }
+        .comment-input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .comment-list {
+            margin-top: 20px;
+        }
+        .comment {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .comment-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2980b9;
+        }
+        .comment-date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -106,13 +138,16 @@
             <div class="comments-section">
                 <h2>Comments</h2>
                 <p>Share your thoughts about these books below!</p>
-                <script src="https://utteranc.es/client.js"
-                        repo="etindell/LST"
-                        issue-term="pathname"
-                        theme="github-light"
-                        crossorigin="anonymous"
-                        async>
-                </script>
+                
+                <div class="comment-form">
+                    <input type="text" id="nameInput" class="comment-input" placeholder="Your name">
+                    <textarea id="commentInput" class="comment-input" rows="4" placeholder="Write your comment here..."></textarea>
+                    <button onclick="addComment()" class="submit-button">Post Comment</button>
+                </div>
+
+                <div id="commentList" class="comment-list">
+                    <!-- Comments will be added here -->
+                </div>
             </div>
         </div>
     </div>
@@ -127,6 +162,7 @@
                 document.getElementById('mainContent').style.display = 'block';
                 // Store in session storage so it remembers during the browser session
                 sessionStorage.setItem('authenticated', 'true');
+                loadComments(); // Load saved comments
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
             }
@@ -136,14 +172,64 @@
         if (sessionStorage.getItem('authenticated') === 'true') {
             document.getElementById('passwordScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
+            loadComments(); // Load saved comments
         }
 
-        // Allow Enter key to submit
+        // Allow Enter key to submit password
         document.getElementById('passwordInput').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 checkPassword();
             }
         });
+
+        // Comment system functions
+        function addComment() {
+            const name = document.getElementById('nameInput').value.trim();
+            const comment = document.getElementById('commentInput').value.trim();
+            
+            if (!name || !comment) {
+                alert('Please enter both your name and a comment!');
+                return;
+            }
+
+            const date = new Date().toLocaleString();
+            const commentObj = { name, comment, date };
+            
+            // Get existing comments or initialize empty array
+            let comments = JSON.parse(localStorage.getItem('comments') || '[]');
+            comments.push(commentObj);
+            
+            // Save to localStorage
+            localStorage.setItem('comments', JSON.stringify(comments));
+            
+            // Clear input fields
+            document.getElementById('nameInput').value = '';
+            document.getElementById('commentInput').value = '';
+            
+            // Refresh comments display
+            displayComments(comments);
+        }
+
+        function loadComments() {
+            const comments = JSON.parse(localStorage.getItem('comments') || '[]');
+            displayComments(comments);
+        }
+
+        function displayComments(comments) {
+            const commentList = document.getElementById('commentList');
+            commentList.innerHTML = ''; // Clear existing comments
+            
+            comments.forEach(comment => {
+                const commentElement = document.createElement('div');
+                commentElement.className = 'comment';
+                commentElement.innerHTML = `
+                    <div class="comment-header">${comment.name}</div>
+                    <div class="comment-date">${comment.date}</div>
+                    <div class="comment-text">${comment.comment}</div>
+                `;
+                commentList.appendChild(commentElement);
+            });
+        }
     </script>
 </body>
 </html> 
