@@ -33,36 +33,38 @@
             position: fixed;
             width: 0;
             height: 0;
-            border-right: 25px solid transparent;
-            border-bottom: 17.5px solid #c183c1; /* Lighter purple that matches the image */
-            border-left: 25px solid transparent;
-            transform: rotate(35deg);
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #e6c3e6; /* Even lighter purple */
+            border-left: 15px solid transparent;
+            transform-origin: 50% 50%;
             z-index: 0;
             pointer-events: none;
         }
         .star:before {
             content: '';
-            position: fixed;
+            position: absolute; /* Changed from fixed to absolute */
             width: 0;
             height: 0;
-            border-bottom: 17.5px solid #c183c1;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            transform: rotate(-35deg);
-            left: -25px;
-            top: -13px;
+            top: 6px;
+            left: -15px;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #e6c3e6;
+            border-left: 15px solid transparent;
+            transform: rotate(70deg);
+            transform-origin: 50% 50%;
         }
         .star:after {
             content: '';
-            position: fixed;
+            position: absolute; /* Changed from fixed to absolute */
             width: 0;
             height: 0;
-            border-bottom: 17.5px solid #c183c1;
-            border-left: 25px solid transparent;
-            border-right: 25px solid transparent;
+            top: 6px;
+            left: -15px;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #e6c3e6;
+            border-left: 15px solid transparent;
             transform: rotate(-70deg);
-            left: -25px;
-            top: 0;
+            transform-origin: 50% 50%;
         }
 
         /* Add multiple stars */
