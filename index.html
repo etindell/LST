@@ -15,37 +15,8 @@
             min-height: 100vh;
         }
 
-        /* Stars background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Create star shape using clip-path */
-        .star {
-            position: fixed;
-            width: 30px;
-            height: 30px;
-            background-color: #e6c3e6; /* Light purple */
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Remove the pseudo-elements since we're using clip-path */
-        .star:before, .star:after {
-            display: none;
-        }
-
-        /* Add multiple stars */
-        .stars-container {
+        /* Book covers background */
+        .covers-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -54,12 +25,23 @@
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
+            opacity: 0.2; /* Make the background subtle */
+        }
+
+        .book-cover {
+            position: absolute;
+            width: 150px;
+            height: 225px; /* 3:2 ratio typical for book covers */
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: opacity 0.3s ease;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.85); /* More transparent white */
+            background-color: rgba(255, 255, 255, 0.95); /* More opaque to ensure readability */
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
@@ -235,6 +217,7 @@
                 <input type="text" id="recommenderName" class="comment-input" placeholder="Your name">
                 <input type="text" id="bookTitle" class="comment-input" placeholder="Book title">
                 <input type="text" id="bookAuthor" class="comment-input" placeholder="Book author">
+                <input type="text" id="bookCover" class="comment-input" placeholder="Book cover image URL">
                 <textarea id="bookDescription" class="comment-input" rows="4" placeholder="Why do you recommend this book?"></textarea>
                 <button onclick="addRecommendation()" class="submit-button">Post Recommendation</button>
             </div>
@@ -245,50 +228,42 @@
         </div>
     </div>
 
-    <div class="stars-container" id="starsContainer"></div>
+    <div class="covers-container" id="coversContainer"></div>
 
     <script>
-        // Create stars with better distribution
-        function createStars(count) {
-            const container = document.getElementById('starsContainer');
-            container.innerHTML = ''; // Clear existing stars
+        // Create book cover collage
+        function updateBookCovers() {
+            const container = document.getElementById('coversContainer');
+            container.innerHTML = '';
             
-            // Create stars with better distribution
-            for (let i = 0; i < count; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                // Use absolute positioning with better spread
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.opacity = (Math.random() * 0.3 + 0.3).toString(); // Random opacity between 0.3 and 0.6
-                
-                // Random size variation
-                const scale = Math.random() * 0.5 + 0.75; // Random scale between 0.75 and 1.25
-                star.style.transform = `rotate(${Math.random() * 360}deg) scale(${scale})`;
-                
-                container.appendChild(star);
-            }
-
-            // Add some guaranteed stars in the middle section
-            for (let i = 0; i < 10; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                // Position in middle third of screen
-                star.style.left = `${30 + Math.random() * 40}%`;
-                star.style.top = `${30 + Math.random() * 40}%`;
-                star.style.opacity = (Math.random() * 0.3 + 0.3).toString();
-                
-                const scale = Math.random() * 0.5 + 0.75;
-                star.style.transform = `rotate(${Math.random() * 360}deg) scale(${scale})`;
-                
-                container.appendChild(star);
-            }
+            // Get all recommendations
+            let recommendations = JSON.parse(localStorage.getItem('recommendations') || '[]');
+            
+            // Add default cover for Cogheart
+            recommendations = [{
+                coverUrl: 'https://m.media-amazon.com/images/I/51jn8HFylBL._SY445_SX342_.jpg',
+                title: 'Cogheart'
+            }, ...recommendations];
+            
+            // Use only the most recent 12 books
+            recommendations = recommendations.slice(0, 12);
+            
+            recommendations.forEach((recommendation, index) => {
+                if (recommendation.coverUrl) {
+                    const cover = document.createElement('div');
+                    cover.className = 'book-cover';
+                    cover.style.backgroundImage = `url(${recommendation.coverUrl})`;
+                    
+                    // Position covers in a grid-like pattern
+                    const row = Math.floor(index / 4);
+                    const col = index % 4;
+                    cover.style.left = `${col * 25}%`;
+                    cover.style.top = `${row * 33.33}%`;
+                    
+                    container.appendChild(cover);
+                }
+            });
         }
-
-        // Create 50 stars (40 random + 10 middle) when the page loads
-        window.addEventListener('load', () => createStars(40));
 
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
@@ -323,32 +298,33 @@
             const name = document.getElementById('recommenderName').value.trim();
             const title = document.getElementById('bookTitle').value.trim();
             const author = document.getElementById('bookAuthor').value.trim();
+            const coverUrl = document.getElementById('bookCover').value.trim();
             const description = document.getElementById('bookDescription').value.trim();
             
             if (!name || !title || !author || !description) {
-                alert('Please fill in all fields!');
+                alert('Please fill in all required fields (cover URL is optional)!');
                 return;
             }
 
             const date = new Date().toLocaleString();
-            const id = Date.now().toString(); // Unique ID for the recommendation
-            const recommendation = { id, name, title, author, description, date, comments: [] };
+            const id = Date.now().toString();
+            const recommendation = { id, name, title, author, description, coverUrl, date, comments: [] };
             
-            // Get existing recommendations or initialize empty array
             let recommendations = JSON.parse(localStorage.getItem('recommendations') || '[]');
             recommendations.push(recommendation);
             
-            // Save to localStorage
             localStorage.setItem('recommendations', JSON.stringify(recommendations));
             
             // Clear input fields
             document.getElementById('recommenderName').value = '';
             document.getElementById('bookTitle').value = '';
             document.getElementById('bookAuthor').value = '';
+            document.getElementById('bookCover').value = '';
             document.getElementById('bookDescription').value = '';
             
-            // Refresh recommendations display
+            // Update both the recommendations list and the background
             displayRecommendations();
+            updateBookCovers();
         }
 
         function addCommentToRecommendation(recommendationId) {
@@ -397,12 +373,13 @@
             
             recommendationsList.innerHTML = '<h2>Book Recommendations</h2>';
             
-            // Add L's original recommendation
+            // Add L's original recommendation with Cogheart cover
             const originalRecommendation = `
                 <div class="book-recommendation">
                     <div class="recommendation-author">L</div>
                     <div class="recommendation-date">Original Post</div>
                     <h3>The Cogheart Series by Peter Bunzl</h3>
+                    <img src="https://m.media-amazon.com/images/I/51jn8HFylBL._SY445_SX342_.jpg" alt="Cogheart Cover" style="max-width: 150px; margin: 10px 0;">
                     <p>First recommendation on the message board!</p>
                     <div class="recommendation-comments">
                         <h4>Comments</h4>
@@ -429,11 +406,15 @@
                     </div>
                 `).join('');
 
+                const coverHtml = recommendation.coverUrl ? 
+                    `<img src="${recommendation.coverUrl}" alt="${recommendation.title} Cover" style="max-width: 150px; margin: 10px 0;">` : '';
+
                 recommendationElement.innerHTML = `
                     <button onclick="deleteRecommendation('${recommendation.id}')" class="delete-button">Delete</button>
                     <div class="recommendation-author">${recommendation.name}</div>
                     <div class="recommendation-date">${recommendation.date}</div>
                     <h3>${recommendation.title} by ${recommendation.author}</h3>
+                    ${coverHtml}
                     <p>${recommendation.description}</p>
                     <div class="recommendation-comments">
                         <h4>Comments</h4>
@@ -448,6 +429,12 @@
                 recommendationsList.appendChild(recommendationElement);
             });
         }
+
+        // Initialize the book covers when the page loads
+        window.addEventListener('load', () => {
+            displayRecommendations();
+            updateBookCovers();
+        });
     </script>
 </body>
 </html> 
