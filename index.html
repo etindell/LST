@@ -42,36 +42,108 @@
             padding-top: 20px;
             border-top: 2px solid #eee;
         }
+        #mainContent {
+            display: none;
+        }
+        #passwordScreen {
+            text-align: center;
+            padding: 40px;
+        }
+        .password-input {
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .submit-button {
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-button:hover {
+            background-color: #27ae60;
+        }
+        .error-message {
+            color: #d63031;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to L's Message Board!</h1>
-        
-        <p>This will be a website where people can share book recommendations and reviews.</p>
-        
-        <p class="warning">
-            Only people from the Academy 24'25 will be able to use the website.<br>
-            (There will be a password, but I haven't figured out how to add it yet).<br>
-            If you are not from the Academy 24'25, please leave the website.
-        </p>
-
-        <div class="book-recommendation">
-            <h2>My First Book Recommendation:</h2>
-            <p>The Cogheart Series by Peter Bunzl</p>
+        <div id="passwordScreen">
+            <h1>Welcome to L's Message Board</h1>
+            <p>This website is only for Academy 24'25 members.</p>
+            <p>Please enter the password to continue:</p>
+            <input type="password" id="passwordInput" class="password-input" placeholder="Enter password">
+            <br>
+            <button onclick="checkPassword()" class="submit-button">Enter</button>
+            <p id="errorMessage" class="error-message">Incorrect password. Please try again.</p>
         </div>
 
-        <div class="comments-section">
-            <h2>Comments</h2>
-            <p>Share your thoughts about these books below!</p>
-            <script src="https://utteranc.es/client.js"
-                    repo="etindell/LST"
-                    issue-term="pathname"
-                    theme="github-light"
-                    crossorigin="anonymous"
-                    async>
-            </script>
+        <div id="mainContent">
+            <h1>Welcome to L's Message Board!</h1>
+            
+            <p>This will be a website where people can share book recommendations and reviews.</p>
+            
+            <p class="warning">
+                Only people from the Academy 24'25 will be able to use the website.<br>
+                (There will be a password, but I haven't figured out how to add it yet).<br>
+                If you are not from the Academy 24'25, please leave the website.
+            </p>
+
+            <div class="book-recommendation">
+                <h2>My First Book Recommendation:</h2>
+                <p>The Cogheart Series by Peter Bunzl</p>
+            </div>
+
+            <div class="comments-section">
+                <h2>Comments</h2>
+                <p>Share your thoughts about these books below!</p>
+                <script src="https://utteranc.es/client.js"
+                        repo="etindell/LST"
+                        issue-term="pathname"
+                        theme="github-light"
+                        crossorigin="anonymous"
+                        async>
+                </script>
+            </div>
         </div>
     </div>
+
+    <script>
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const correctPassword = 'Academy2425'; // You can change this to any password you want
+            
+            if (password === correctPassword) {
+                document.getElementById('passwordScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                // Store in session storage so it remembers during the browser session
+                sessionStorage.setItem('authenticated', 'true');
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        // Check if already authenticated
+        if (sessionStorage.getItem('authenticated') === 'true') {
+            document.getElementById('passwordScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('passwordInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
 </body>
 </html> 
