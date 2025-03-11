@@ -20,7 +20,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        h1 {
+        h1, h2 {
             color: #333;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
@@ -36,6 +36,11 @@
             background-color: #f8f9fa;
             border-left: 4px solid #2ecc71;
             border-radius: 4px;
+        }
+        .comments-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
         }
     </style>
 </head>
@@ -54,6 +59,18 @@
         <div class="book-recommendation">
             <h2>My First Book Recommendation:</h2>
             <p>The Cogheart Series by Peter Bunzl</p>
+        </div>
+
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <p>Share your thoughts about these books below!</p>
+            <script src="https://utteranc.es/client.js"
+                    repo="etindell/LST"
+                    issue-term="pathname"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+            </script>
         </div>
     </div>
 </body>
