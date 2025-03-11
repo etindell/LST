@@ -33,9 +33,9 @@
             position: fixed;
             width: 0;
             height: 0;
-            border-right: 30px solid transparent;
-            border-bottom: 20px solid #800080; /* Regular purple */
-            border-left: 30px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 17.5px solid #c183c1; /* Lighter purple that matches the image */
+            border-left: 25px solid transparent;
             transform: rotate(35deg);
             z-index: 0;
             pointer-events: none;
@@ -45,23 +45,23 @@
             position: fixed;
             width: 0;
             height: 0;
-            border-bottom: 20px solid #800080;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
+            border-bottom: 17.5px solid #c183c1;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
             transform: rotate(-35deg);
-            left: -30px;
-            top: -15px;
+            left: -25px;
+            top: -13px;
         }
         .star:after {
             content: '';
             position: fixed;
             width: 0;
             height: 0;
-            border-bottom: 20px solid #800080;
-            border-left: 30px solid transparent;
-            border-right: 30px solid transparent;
+            border-bottom: 17.5px solid #c183c1;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
             transform: rotate(-70deg);
-            left: -30px;
+            left: -25px;
             top: 0;
         }
 
@@ -74,6 +74,7 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
+            overflow: hidden;
         }
 
         .container {
@@ -269,21 +270,40 @@
     <div class="stars-container" id="starsContainer"></div>
 
     <script>
-        // Create stars
+        // Create stars in a grid pattern with some randomness
         function createStars(count) {
             const container = document.getElementById('starsContainer');
-            for (let i = 0; i < count; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.opacity = '0.6';
-                container.appendChild(star);
+            container.innerHTML = ''; // Clear existing stars
+            
+            // Create a grid of stars
+            const gridSize = Math.ceil(Math.sqrt(count));
+            const cellWidth = 100 / gridSize;
+            const cellHeight = 100 / gridSize;
+            
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    
+                    // Add some randomness within each grid cell
+                    const randomX = (Math.random() * 0.5 + 0.25) * cellWidth;
+                    const randomY = (Math.random() * 0.5 + 0.25) * cellHeight;
+                    
+                    star.style.left = `${i * cellWidth + randomX}%`;
+                    star.style.top = `${j * cellHeight + randomY}%`;
+                    star.style.opacity = (Math.random() * 0.3 + 0.3).toString(); // Random opacity between 0.3 and 0.6
+                    
+                    // Random size variation
+                    const scale = Math.random() * 0.5 + 0.75; // Random scale between 0.75 and 1.25
+                    star.style.transform = `rotate(35deg) scale(${scale})`;
+                    
+                    container.appendChild(star);
+                }
             }
         }
 
-        // Create 20 stars when the page loads
-        window.addEventListener('load', () => createStars(20));
+        // Create 36 stars (6x6 grid) when the page loads
+        window.addEventListener('load', () => createStars(36));
 
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
