@@ -23,14 +23,57 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
-                radial-gradient(#b19cd9 15px, transparent 15px), /* Light purple, much larger stars */
-                radial-gradient(#b19cd9 15px, transparent 15px);
-            background-size: 200px 200px; /* Much larger spacing for bigger stars */
-            background-position: 0 0, 100px 100px;
-            opacity: 0.4; /* Slightly more visible */
-            pointer-events: none;
+            background-color: transparent;
             z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Create star shape using pseudo-elements */
+        .star {
+            position: fixed;
+            width: 0;
+            height: 0;
+            border-right: 30px solid transparent;
+            border-bottom: 20px solid #800080; /* Regular purple */
+            border-left: 30px solid transparent;
+            transform: rotate(35deg);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .star:before {
+            content: '';
+            position: fixed;
+            width: 0;
+            height: 0;
+            border-bottom: 20px solid #800080;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            transform: rotate(-35deg);
+            left: -30px;
+            top: -15px;
+        }
+        .star:after {
+            content: '';
+            position: fixed;
+            width: 0;
+            height: 0;
+            border-bottom: 20px solid #800080;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            transform: rotate(-70deg);
+            left: -30px;
+            top: 0;
+        }
+
+        /* Add multiple stars */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .container {
@@ -223,7 +266,25 @@
         </div>
     </div>
 
+    <div class="stars-container" id="starsContainer"></div>
+
     <script>
+        // Create stars
+        function createStars(count) {
+            const container = document.getElementById('starsContainer');
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.opacity = '0.6';
+                container.appendChild(star);
+            }
+        }
+
+        // Create 20 stars when the page loads
+        window.addEventListener('load', () => createStars(20));
+
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             const correctPassword = '#AcademyBooks'; // You can change this to any password you want
