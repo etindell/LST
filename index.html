@@ -28,43 +28,20 @@
             pointer-events: none;
         }
 
-        /* Create star shape using pseudo-elements */
+        /* Create star shape using clip-path */
         .star {
             position: fixed;
-            width: 0;
-            height: 0;
-            border-right: 15px solid transparent;
-            border-bottom: 20px solid #e6c3e6; /* Even lighter purple */
-            border-left: 15px solid transparent;
-            transform-origin: 50% 50%;
+            width: 30px;
+            height: 30px;
+            background-color: #e6c3e6; /* Light purple */
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             z-index: 0;
             pointer-events: none;
         }
-        .star:before {
-            content: '';
-            position: absolute; /* Changed from fixed to absolute */
-            width: 0;
-            height: 0;
-            top: 6px;
-            left: -15px;
-            border-right: 15px solid transparent;
-            border-bottom: 20px solid #e6c3e6;
-            border-left: 15px solid transparent;
-            transform: rotate(70deg);
-            transform-origin: 50% 50%;
-        }
-        .star:after {
-            content: '';
-            position: absolute; /* Changed from fixed to absolute */
-            width: 0;
-            height: 0;
-            top: 6px;
-            left: -15px;
-            border-right: 15px solid transparent;
-            border-bottom: 20px solid #e6c3e6;
-            border-left: 15px solid transparent;
-            transform: rotate(-70deg);
-            transform-origin: 50% 50%;
+
+        /* Remove the pseudo-elements since we're using clip-path */
+        .star:before, .star:after {
+            display: none;
         }
 
         /* Add multiple stars */
