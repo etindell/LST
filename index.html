@@ -252,16 +252,16 @@
 
             if (uniqueCovers.length === 0) return;
 
-            // Calculate how many covers we need to fill the screen with some overlap
+            // Calculate how many covers we need to fill the screen with more overlap
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
             const coverWidth = 120;
             const coverHeight = 180;
-            const coverSpacing = 100; // Space between covers
+            const coverSpacing = 80; // Reduced spacing between covers for better coverage
 
-            // Calculate number of covers needed to fill screen with overlap
-            const coversNeededX = Math.ceil(viewportWidth / coverSpacing) + 1;
-            const coversNeededY = Math.ceil(viewportHeight / coverSpacing) + 1;
+            // Calculate number of covers needed with extra padding
+            const coversNeededX = Math.ceil(viewportWidth / coverSpacing) + 2; // Add extra column on each side
+            const coversNeededY = Math.ceil(viewportHeight / coverSpacing) + 2; // Add extra row top and bottom
             const totalCoversNeeded = coversNeededX * coversNeededY;
 
             // Create array of covers by repeating available covers
@@ -275,19 +275,19 @@
                 cover.className = 'book-cover';
                 cover.style.backgroundImage = `url(${coverUrl})`;
                 
-                // Calculate base grid position
-                const row = Math.floor(index / coversNeededX);
-                const col = index % coversNeededX;
+                // Calculate base grid position (start from -1 to extend beyond viewport)
+                const row = Math.floor(index / coversNeededX) - 1;
+                const col = index % coversNeededX - 1;
                 
-                // Add random offset to grid position
-                const randomOffsetX = Math.random() * 40 - 20; // ±20px
-                const randomOffsetY = Math.random() * 40 - 20; // ±20px
+                // Add random offset to grid position (increased range)
+                const randomOffsetX = Math.random() * 60 - 30; // ±30px
+                const randomOffsetY = Math.random() * 60 - 30; // ±30px
                 
                 const x = (col * coverSpacing) + randomOffsetX;
                 const y = (row * coverSpacing) + randomOffsetY;
                 
-                // Random rotation between -20 and 20 degrees
-                const rotation = (Math.random() * 40 - 20);
+                // Random rotation between -25 and 25 degrees (slightly more rotation)
+                const rotation = (Math.random() * 50 - 25);
                 
                 cover.style.left = `${x}px`;
                 cover.style.top = `${y}px`;
@@ -297,6 +297,7 @@
             });
 
             // Update covers when window is resized
+            window.removeEventListener('resize', debounce(updateBookCovers, 250)); // Remove old listener
             window.addEventListener('resize', debounce(updateBookCovers, 250));
         }
 
