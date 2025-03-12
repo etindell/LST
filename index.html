@@ -355,16 +355,16 @@
 
             if (uniqueCovers.length === 0) return;
 
-            // Calculate how many covers we need to fill the screen with more overlap
+            // Calculate dimensions with overlap for complete coverage
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
             const coverWidth = 120;
             const coverHeight = 180;
-            const coverSpacing = 80; // Reduced spacing between covers for better coverage
+            const coverSpacing = 60; // Reduced spacing for more overlap
 
             // Calculate number of covers needed with extra padding
-            const coversNeededX = Math.ceil(viewportWidth / coverSpacing) + 2; // Add extra column on each side
-            const coversNeededY = Math.ceil(viewportHeight / coverSpacing) + 2; // Add extra row top and bottom
+            const coversNeededX = Math.ceil(viewportWidth / (coverSpacing * 0.7)) + 4; // Add more columns
+            const coversNeededY = Math.ceil(viewportHeight / (coverSpacing * 0.7)) + 4; // Add more rows
             const totalCoversNeeded = coversNeededX * coversNeededY;
 
             // Create array of covers by repeating available covers
@@ -372,35 +372,57 @@
                 uniqueCovers[Math.floor(Math.random() * uniqueCovers.length)]
             );
             
-            // Place covers in a grid with random offsets
+            // Place covers in a grid with random offsets and ensure edge coverage
             covers.forEach((coverUrl, index) => {
                 const cover = document.createElement('div');
                 cover.className = 'book-cover';
                 cover.style.backgroundImage = `url(${coverUrl})`;
                 
-                // Calculate base grid position (start from -1 to extend beyond viewport)
-                const row = Math.floor(index / coversNeededX) - 1;
-                const col = index % coversNeededX - 1;
+                // Calculate base grid position (start further out to ensure edge coverage)
+                const row = Math.floor(index / coversNeededX) - 2;
+                const col = index % coversNeededX - 2;
                 
-                // Add random offset to grid position (increased range)
-                const randomOffsetX = Math.random() * 60 - 30; // ±30px
-                const randomOffsetY = Math.random() * 60 - 30; // ±30px
+                // Add random offset with larger range for better distribution
+                const randomOffsetX = Math.random() * 80 - 40; // ±40px
+                const randomOffsetY = Math.random() * 80 - 40; // ±40px
                 
                 const x = (col * coverSpacing) + randomOffsetX;
                 const y = (row * coverSpacing) + randomOffsetY;
                 
-                // Random rotation between -25 and 25 degrees (slightly more rotation)
-                const rotation = (Math.random() * 50 - 25);
+                // Random rotation between -30 and 30 degrees
+                const rotation = (Math.random() * 60 - 30);
+                
+                // Add random scale variation for more natural look
+                const scale = 0.9 + Math.random() * 0.4; // Scale between 0.9 and 1.3
                 
                 cover.style.left = `${x}px`;
                 cover.style.top = `${y}px`;
                 cover.style.setProperty('--rotation', `${rotation}deg`);
+                cover.style.transform = `rotate(${rotation}deg) scale(${scale})`;
                 
                 container.appendChild(cover);
             });
 
+            // Add extra covers at the edges for complete coverage
+            const edgePositions = [
+                {x: -coverWidth, y: -coverHeight},
+                {x: viewportWidth, y: -coverHeight},
+                {x: -coverWidth, y: viewportHeight},
+                {x: viewportWidth, y: viewportHeight}
+            ];
+
+            edgePositions.forEach(pos => {
+                const cover = document.createElement('div');
+                cover.className = 'book-cover';
+                cover.style.backgroundImage = `url(${uniqueCovers[Math.floor(Math.random() * uniqueCovers.length)]})`;
+                cover.style.left = `${pos.x}px`;
+                cover.style.top = `${pos.y}px`;
+                cover.style.transform = `rotate(${Math.random() * 60 - 30}deg) scale(1.2)`;
+                container.appendChild(cover);
+            });
+
             // Update covers when window is resized
-            window.removeEventListener('resize', debounce(updateBookCovers, 250)); // Remove old listener
+            window.removeEventListener('resize', debounce(updateBookCovers, 250));
             window.addEventListener('resize', debounce(updateBookCovers, 250));
         }
 
