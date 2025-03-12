@@ -245,42 +245,72 @@
                 title: 'Cogheart'
             }, ...recommendations];
             
-            // Create multiple copies of each cover for a repeating pattern
-            const covers = [];
-            recommendations.forEach(recommendation => {
-                if (recommendation.coverUrl) {
-                    // Create multiple instances of each cover
-                    for (let i = 0; i < 6; i++) { // Create 6 copies of each cover
-                        covers.push(recommendation.coverUrl);
-                    }
-                }
-            });
+            // Get unique cover URLs
+            const uniqueCovers = recommendations
+                .filter(r => r.coverUrl)
+                .map(r => r.coverUrl);
 
-            // Calculate how many covers we need to fill the screen
+            if (uniqueCovers.length === 0) return;
+
+            // Calculate how many covers we need to fill the screen with some overlap
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
             const coverWidth = 120;
             const coverHeight = 180;
+            const coverSpacing = 100; // Space between covers
+
+            // Calculate number of covers needed to fill screen with overlap
+            const coversNeededX = Math.ceil(viewportWidth / coverSpacing) + 1;
+            const coversNeededY = Math.ceil(viewportHeight / coverSpacing) + 1;
+            const totalCoversNeeded = coversNeededX * coversNeededY;
+
+            // Create array of covers by repeating available covers
+            const covers = Array(totalCoversNeeded).fill().map(() => 
+                uniqueCovers[Math.floor(Math.random() * uniqueCovers.length)]
+            );
             
-            // Create covers to fill the screen with some overlap
+            // Place covers in a grid with random offsets
             covers.forEach((coverUrl, index) => {
                 const cover = document.createElement('div');
                 cover.className = 'book-cover';
                 cover.style.backgroundImage = `url(${coverUrl})`;
                 
-                // Random position within viewport
-                const randomX = Math.random() * (viewportWidth - coverWidth);
-                const randomY = Math.random() * (viewportHeight - coverHeight);
+                // Calculate base grid position
+                const row = Math.floor(index / coversNeededX);
+                const col = index % coversNeededX;
+                
+                // Add random offset to grid position
+                const randomOffsetX = Math.random() * 40 - 20; // ±20px
+                const randomOffsetY = Math.random() * 40 - 20; // ±20px
+                
+                const x = (col * coverSpacing) + randomOffsetX;
+                const y = (row * coverSpacing) + randomOffsetY;
                 
                 // Random rotation between -20 and 20 degrees
                 const rotation = (Math.random() * 40 - 20);
                 
-                cover.style.left = `${randomX}px`;
-                cover.style.top = `${randomY}px`;
+                cover.style.left = `${x}px`;
+                cover.style.top = `${y}px`;
                 cover.style.setProperty('--rotation', `${rotation}deg`);
                 
                 container.appendChild(cover);
             });
+
+            // Update covers when window is resized
+            window.addEventListener('resize', debounce(updateBookCovers, 250));
+        }
+
+        // Debounce function to prevent too many resize updates
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
         function checkPassword() {
