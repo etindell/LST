@@ -25,16 +25,17 @@
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
-            opacity: 0.2; /* Make the background subtle */
+            opacity: 0.15; /* Slightly more subtle */
         }
 
         .book-cover {
             position: absolute;
-            width: 150px;
-            height: 225px; /* 3:2 ratio typical for book covers */
+            width: 120px; /* Slightly smaller for more covers */
+            height: 180px;
             background-size: cover;
             background-position: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: rotate(var(--rotation)); /* Random rotation for each cover */
             transition: opacity 0.3s ease;
         }
 
@@ -244,23 +245,41 @@
                 title: 'Cogheart'
             }, ...recommendations];
             
-            // Use only the most recent 12 books
-            recommendations = recommendations.slice(0, 12);
-            
-            recommendations.forEach((recommendation, index) => {
+            // Create multiple copies of each cover for a repeating pattern
+            const covers = [];
+            recommendations.forEach(recommendation => {
                 if (recommendation.coverUrl) {
-                    const cover = document.createElement('div');
-                    cover.className = 'book-cover';
-                    cover.style.backgroundImage = `url(${recommendation.coverUrl})`;
-                    
-                    // Position covers in a grid-like pattern
-                    const row = Math.floor(index / 4);
-                    const col = index % 4;
-                    cover.style.left = `${col * 25}%`;
-                    cover.style.top = `${row * 33.33}%`;
-                    
-                    container.appendChild(cover);
+                    // Create multiple instances of each cover
+                    for (let i = 0; i < 6; i++) { // Create 6 copies of each cover
+                        covers.push(recommendation.coverUrl);
+                    }
                 }
+            });
+
+            // Calculate how many covers we need to fill the screen
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const coverWidth = 120;
+            const coverHeight = 180;
+            
+            // Create covers to fill the screen with some overlap
+            covers.forEach((coverUrl, index) => {
+                const cover = document.createElement('div');
+                cover.className = 'book-cover';
+                cover.style.backgroundImage = `url(${coverUrl})`;
+                
+                // Random position within viewport
+                const randomX = Math.random() * (viewportWidth - coverWidth);
+                const randomY = Math.random() * (viewportHeight - coverHeight);
+                
+                // Random rotation between -20 and 20 degrees
+                const rotation = (Math.random() * 40 - 20);
+                
+                cover.style.left = `${randomX}px`;
+                cover.style.top = `${randomY}px`;
+                cover.style.setProperty('--rotation', `${rotation}deg`);
+                
+                container.appendChild(cover);
             });
         }
 
@@ -418,13 +437,12 @@
             
             recommendationsList.innerHTML = '<h2>Book Recommendations</h2>';
             
-            // Add L's original recommendation with Cogheart cover
+            // Add L's original recommendation without the cover image
             const originalRecommendation = `
                 <div class="book-recommendation">
                     <div class="recommendation-author">L</div>
                     <div class="recommendation-date">Original Post</div>
                     <h3>The Cogheart Series by Peter Bunzl</h3>
-                    <img src="https://m.media-amazon.com/images/I/51jn8HFylBL._SY445_SX342_.jpg" alt="Cogheart Cover" style="max-width: 150px; margin: 10px 0;">
                     <p>First recommendation on the message board!</p>
                     <div class="recommendation-comments">
                         <h4>Comments</h4>
@@ -438,7 +456,7 @@
             `;
             recommendationsList.innerHTML += originalRecommendation;
             
-            // Display user-added recommendations
+            // Display user-added recommendations without cover images
             recommendations.forEach(recommendation => {
                 const recommendationElement = document.createElement('div');
                 recommendationElement.className = 'book-recommendation';
@@ -451,15 +469,11 @@
                     </div>
                 `).join('');
 
-                const coverHtml = recommendation.coverUrl ? 
-                    `<img src="${recommendation.coverUrl}" alt="${recommendation.title} Cover" style="max-width: 150px; margin: 10px 0;">` : '';
-
                 recommendationElement.innerHTML = `
                     <button onclick="deleteRecommendation('${recommendation.id}')" class="delete-button">Delete</button>
                     <div class="recommendation-author">${recommendation.name}</div>
                     <div class="recommendation-date">${recommendation.date}</div>
                     <h3>${recommendation.title} by ${recommendation.author}</h3>
-                    ${coverHtml}
                     <p>${recommendation.description}</p>
                     <div class="recommendation-comments">
                         <h4>Comments</h4>
